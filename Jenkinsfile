@@ -30,18 +30,12 @@ pipeline {
         stage('plan') {
             steps {
                 sh '''
-                    pwd
-                    cd eks/
                     terraform init
                 '''
                 sh '''
-                    pwd
-                    cd eks/
                     terraform plan -out=tfplan
                 '''
                 sh '''
-                    pwd
-                    cd eks/
                     terraform show -no-color tfplan > tfplan.txt
                 '''
             }
