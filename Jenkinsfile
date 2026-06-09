@@ -29,6 +29,7 @@ pipeline {
 
         stage('plan') {
             steps {
+                dir("terraform"){
                 sh '''
                     terraform init
                 '''
@@ -37,8 +38,11 @@ pipeline {
                 '''
                 sh '''
                     terraform show -no-color tfplan > tfplan.txt
+            
                 '''
+                }
             }
+
         }
 
         stage('approve') {
