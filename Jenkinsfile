@@ -31,16 +31,19 @@ pipeline {
             steps {
                 sh '''
                     pwd
+                    mkdir eks
                     cd eks/
                     terraform init
                 '''
                 sh '''
                     pwd
+                    mkdir eks
                     cd eks/
                     terraform plan -out=tfplan
                 '''
                 sh '''
                     pwd
+                    mkdir eks
                     cd eks/
                     terraform show -no-color tfplan > tfplan.txt
                 '''
