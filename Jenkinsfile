@@ -15,20 +15,9 @@ pipeline{
             steps{
                 script{
                     dir("terraform"){
-                        git url: 'https://github.com/SomashekarMH/eks.git',branch: 'main'
+                        git url: 'https://github.com/ManojKRISHNAPPA/Itkannadigaru-chatbot.git',branch: 'Iac-devenv'
                     }
                 }
-            }
-        }
-        stage(debug){
-            steps{
-                sh '''
-                pwd
-                echo "===== Workspace Contents ====="
-                ls -la
-                echo "===== Terraform Files ====="
-                find . -name "*.tf"
-                '''
             }
         }
 
