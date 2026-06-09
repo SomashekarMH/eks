@@ -14,7 +14,7 @@ pipeline{
         stage('Checkout'){
             steps{
                 script{
-                    dir("terraform"){
+                    dir("terraform/eks"){
                         git url: 'https://github.com/SomashekarMH/eks.git',branch: 'main'
                     }
                 }
