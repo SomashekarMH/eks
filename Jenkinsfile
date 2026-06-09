@@ -14,10 +14,21 @@ pipeline{
         stage('Checkout'){
             steps{
                 script{
-                    dir("terraform/eks"){
+                    dir("terraform"){
                         git url: 'https://github.com/SomashekarMH/eks.git',branch: 'main'
                     }
                 }
+            }
+        }
+        stage(debug){
+            steps{
+                ssh '''
+                pwd
+                echo "===== Workspace Contents ====="
+                ls -la
+                echo "===== Terraform Files ====="
+                find . -name "*.tf"
+                '''
             }
         }
 
