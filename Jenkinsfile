@@ -54,7 +54,6 @@ agent any
                     else if(params.terraform_command == 'destroy'){
                         sh 'pwd'; cd EKS/; terraform destroy -auto-approve'
                     }
-                    
                 }
             }
         }
