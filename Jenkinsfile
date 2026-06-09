@@ -19,36 +19,26 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                script {
-                    dir("terraform") {
-                        git url: 'https://github.com/SomashekarMH/eks.git', branch: 'main'
-                    }
+                dir('terraform') {
+                    git url: 'https://github.com/SomashekarMH/eks.git', branch: 'main'
                 }
             }
         }
 
         stage('plan') {
             steps {
-                dir("terraform"){
-                sh '''
-                    terraform init
-                '''
-                sh '''
-                    terraform plan -out=tfplan
-                '''
-                sh '''
-                    terraform show -no-color tfplan > tfplan.txt
-            
-                '''
+                dir('terraform') {
+                    sh 'terraform init'
+                    sh 'terraform plan -out=tfplan'
+                    sh 'terraform show -no-color tfplan > tfplan.txt'
                 }
             }
-
         }
 
         stage('approve') {
             steps {
                 script {
-                    def plan = readFile('eks/tfplan.txt')
+                    def plan = readFile('terraform/tfplan.txt')
 
                     input(
                         message: "Terraform Plan:\n${plan}\n\nDo you want to apply this plan?",
@@ -57,7 +47,7 @@ pipeline {
                             text(
                                 name: 'approval',
                                 defaultValue: 'yes',
-                                description: 'Type "yes" to approve the plan.'
+                                description: 'Type \"yes\" to approve the plan.'
                             )
                         ]
                     )
@@ -76,21 +66,16 @@ pipeline {
             steps {
                 script {
                     if (params.terraform_command == 'apply') {
-                        sh '''
-                            pwd
-                            cd eks/
-                            terraform apply -input=false tfplan
-                        '''
+                        dir('terraform') {
+                            sh 'terraform apply -input=false tfplan'
+                        }
                     } else if (params.terraform_command == 'destroy') {
-                        sh '''
-                            pwd
-                            cd eks/
-                            terraform destroy -auto-approve
-                        '''
+                        dir('terraform') {
+                            sh 'terraform destroy -auto-approve'
+                        }
                     }
                 }
             }
         }
-
     }
 }
