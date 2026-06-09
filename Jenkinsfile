@@ -22,7 +22,7 @@ pipeline{
         }
         stage(debug){
             steps{
-                ssh '''
+                sh '''
                 pwd
                 echo "===== Workspace Contents ====="
                 ls -la
