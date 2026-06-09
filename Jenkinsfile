@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     dir("terraform") {
-                        git url: 'https://github.com/SomashekarMH/eks.git', branch: 'main'
+                        git url: https://github.com/SomashekarMH/eks.git', branch: 'main'
                     }
                 }
             }
