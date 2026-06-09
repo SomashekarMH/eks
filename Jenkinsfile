@@ -1,98 +1,62 @@
-pipeline {
-
-    agent any
-
-    parameters {
-        choice(
-            name: 'terraform_command',
-            choices: ['plan', 'apply', 'destroy'],
-            description: 'Select the Terraform command to execute.'
-        )
+pipeline{
+    parameters{
+        choice(name: 'terraformAction',choices: ['apply','destroy'],description: 'Choose your terraform action')
     }
 
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws_access_key_id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
 
-    stages {
+    agent any
 
-        stage('Checkout') {
-            steps {
-                script {
-                    dir("terraform") {
-                        git url: 'https://github.com/SomashekarMH/eks.git', branch: 'main'
+    stages{
+        stage('Checkout'){
+            steps{
+                script{
+                    dir("terraform"){
+                        git url: 'https://github.com/ManojKRISHNAPPA/Itkannadigaru-chatbot.git',branch: 'Iac-devenv'
                     }
                 }
             }
         }
 
-        stage('plan') {
-            steps {
-                sh '''
-                    pwd
-                    cd EKS/
-                    terraform init
-                '''
-                sh '''
-                    pwd
-                    cd EKS/
-                    terraform plan -out=tfplan
-                '''
-                sh '''
-                    pwd
-                    cd EKS/
-                    terraform show -no-color tfplan > tfplan.txt
-                '''
+        stage('Plan'){
+            steps{
+                sh 'pwd; cd eks/; terraform init'
+                sh 'pwd; cd eks/; terraform plan -out tfplan'
+                sh 'pwd; cd eks/; terraform show -no-color tfplan > tfplan.txt'
             }
         }
 
-        stage('approve') {
-            steps {
-                script {
-                    def plan = readFile('EKS/tfplan.txt')
-
-                    input(
-                        message: "Terraform Plan:\n${plan}\n\nDo you want to apply this plan?",
-                        ok: 'Apply',
-                        parameters: [
-                            text(
-                                name: 'approval',
-                                defaultValue: 'yes',
-                                description: 'Type "yes" to approve the plan.'
-                            )
-                        ]
-                    )
+        stage('Approval'){
+            steps{
+                script{
+                    def plan = readFile 'eks/tfplan.txt'
+                    input message: "Do you want to proceed with the Terraform action?",
+                    parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
                 }
             }
         }
 
-        stage('apply or destroy') {
+        stage('Apply or Destroy'){
             when {
-                expression {
-                    params.terraform_command == 'apply' ||
-                    params.terraform_command == 'destroy'
-                }
+                expression{
+                    return  params.terraformAction == 'apply' || params.terraformAction == 'destroy'
+                } 
             }
-
-            steps {
-                script {
-                    if (params.terraform_command == 'apply') {
-                        sh '''
-                            pwd
-                            cd EKS/
-                            terraform apply -input=false tfplan
-                        '''
-                    } else if (params.terraform_command == 'destroy') {
-                        sh '''
-                            pwd
-                            cd EKS/
-                            terraform destroy -auto-approve
-                        '''
+            steps{
+                script{
+                    if (params.terraformAction == 'apply'){
+                        sh 'pwd; cd eks/; terraform apply -input=false tfplan'
+                    }
+                    else if (params.terraformAction == 'destroy'){
+                        sh 'pwd; cd eks/; terraform destroy -auto-approve'
                     }
                 }
             }
         }
 
     }
+
 }
