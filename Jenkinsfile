@@ -31,17 +31,17 @@ pipeline {
             steps {
                 sh '''
                     pwd
-                    cd EKS/
+                    cd eks/
                     terraform init
                 '''
                 sh '''
                     pwd
-                    cd EKS/
+                    cd eks/
                     terraform plan -out=tfplan
                 '''
                 sh '''
                     pwd
-                    cd EKS/
+                    cd eks/
                     terraform show -no-color tfplan > tfplan.txt
                 '''
             }
@@ -50,7 +50,7 @@ pipeline {
         stage('approve') {
             steps {
                 script {
-                    def plan = readFile('EKS/tfplan.txt')
+                    def plan = readFile('eks/tfplan.txt')
 
                     input(
                         message: "Terraform Plan:\n${plan}\n\nDo you want to apply this plan?",
@@ -80,13 +80,13 @@ pipeline {
                     if (params.terraform_command == 'apply') {
                         sh '''
                             pwd
-                            cd EKS/
+                            cd eks/
                             terraform apply -input=false tfplan
                         '''
                     } else if (params.terraform_command == 'destroy') {
                         sh '''
                             pwd
-                            cd EKS/
+                            cd eks/
                             terraform destroy -auto-approve
                         '''
                     }
